@@ -1,0 +1,11 @@
+event_groups.c:134:20:xEventGroupCreate	16	static
+event_groups.c:154:13:xEventGroupSync	48	static
+event_groups.c:270:13:xEventGroupWaitBits	56	static
+event_groups.c:417:13:xEventGroupClearBits	24	static
+event_groups.c:458:13:xEventGroupGetBitsFromISR	32	static
+event_groups.c:474:13:xEventGroupSetBits	56	static
+event_groups.c:567:6:vEventGroupDelete	24	static
+event_groups.c:592:6:vEventGroupSetBitsCallback	16	static
+event_groups.c:600:6:vEventGroupClearBitsCallback	16	static
+event_groups.c:606:19:prvTestWaitCondition	32	static
+event_groups.c:658:14:uxEventGroupGetNumber	24	static

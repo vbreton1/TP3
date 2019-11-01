@@ -1,0 +1,4 @@
+freertos_examples_1_to_9.c:63:13:prvSetupHardware	8	static
+freertos_examples_1_to_9.c:86:13:vTask1	24	static
+freertos_examples_1_to_9.c:109:13:vTask2	24	static
+freertos_examples_1_to_9.c:142:5:main	24	static
