@@ -3,12 +3,23 @@
 Practica n°3 de sistemas embebidos.
 
 ## 1. Uso del IDE (Integrated Development Environment) LPCXpresso
+
 ### Documentacion de los proyectos importados
 
-texto para explicar...
+#### freertos_examples_1_to_9
+Este ejemplo inicia FreeRTOS y crea 3 tareas. Las tareas 1 y 2 parpadean con diferentes LEDs a diferentes velocidades. La Tarea 3 envía un recuento de tictac al canal de depuración (UART) cada segundo.
+
+
 ```
 codes examples
 ```
+#### freertos_examples_10_to_16
+
+#### lcp_chip_43xx
+
+#### lcp_board_nxp_lpcxpresso_4337
+
+
 ## 2. A partir del proyecto freertos_examples_1_to_9 => Example 1 - Creating tasks
 
 
