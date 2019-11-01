@@ -9,6 +9,10 @@ Practica n°3 de sistemas embebidos.
 #### freertos_examples_1_to_9
 Este ejemplo inicia FreeRTOS y crea 3 tareas. Las tareas 1 y 2 parpadean con diferentes LEDs a diferentes velocidades. La Tarea 3 envía un recuento de tictac al canal de depuración (UART) cada segundo.
 
+| column 1 | column 2 |
+| ----- | ---- |
+| text1 | text2 |
+| text3 |  Text3 |
 
 ```
 codes examples
