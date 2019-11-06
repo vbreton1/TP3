@@ -63,10 +63,22 @@ El ultimo archivo contiene los control de driver de la placa EDU-CIAA-NXP, como 
 
 | funciones | archivo | descripcion | efecto |
 | ----- | ---- | ---- | ---- |
-| prvSetupHardware() | freertos_examples_1_to_9.c | Parametra el sistema hardware |  |
-| DEBUGOUT(pcTextForMain) | board_api.h | funcion de debug, muestra el estado de debug|  |
-| xTaskCreate(vTaskCode, "NAME", STACK_SIZE, &ucParameterToPass, tskIDLE_PRIORITY, &xHandle) | task.c/.h | Crea la tarea, memoriza el handle, asigna prioridades. |  |
-| vTaskStartScheduler() | tasks.c/.h | Inicia el procesamiento en tiempo real, tiene control sobre qué tareas se ejecutan y cuándo. |  |
+| prvSetupHardware() | freertos_examples_1_to_9.c | Parametra el sistema hardware | Llama a funciones de inicialisaciones que estan en librerias relacionadas con el hardware, como LPC18xx/43xx GPIO driver que pilota los pines de hardware.  |
+| DEBUGOUT(pcTextForMain) | board_api.h | funcion de debug, muestra el estado de debug| Funcion que depende de los paramtros de configuracion del sistema. |
+| xTaskCreate(vTaskCode, "NAME", STACK_SIZE, &ucParameterToPass, tskIDLE_PRIORITY, &xHandle) | task.c/.h | Crea la tarea, memoriza el handle, asigna prioridades. | Es part of freeRTOS distribucion que provee un software robusto y estándar |
+| vTaskStartScheduler() | tasks.c/.h | Inicia el procesamiento en tiempo real, tiene control sobre qué tareas se ejecutan y cuándo. | Es igualmente part of the freeRTOS distribucion. |
+
+*prvSetupHardware():
+/*explicar*/
+
+*DEBUGOUT(...):
+/*explicar*/
+
+*xTaskCreate(...):
+/*explicar*/
+
+*vTaskStartScheduler():
+/*explicar*/
 
 ## 2. Ejemplos del 1 al 9
 
