@@ -30,6 +30,26 @@ codes examples
 
 ### freertos_examples_10_to_16
 
+El archivo (.c) se puede desglosar así:
+* Enumeracion de la variables privadas. Estos son #define que permiten eligir la parte del codigo que queremos ejecutar.
+* Funcion privada de setup del hardware.
+* Condiciones sobre el valor de una variable que tiene un valor correspondiente al ejemplo que queremos ejecutar.
+	*EXAMPLE1
+	*EXAMPLE2
+	*EXAMPLE3
+	*EXAMPLE4
+	*EXAMPLE5
+	*EXAMPLE6
+	*EXAMPLE7
+	*EXAMPLE8
+	*EXAMPLE9
+	
+El archivo "readme.txt" permite de entender el funcionamiento y los parametricos de la aplicacion.
+* Descripcion del ejemplo.
+* Configuracion del hardware.
+* Como hacer un 'build' del proyecto.
+
+
 ### lcp_chip_43xx
 
 ### lcp_board_nxp_lpcxpresso_4337
