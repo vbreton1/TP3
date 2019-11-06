@@ -84,10 +84,11 @@ El ultimo archivo contiene los control de driver de la placa EDU-CIAA-NXP, como 
 
 ### Ejemplo 1
 
-![Diagrama temporal ejemplo 1](Ejemplo1.png =250x)
+![Diagrama temporal ejemplo 1](Ejemplo1.png =100x20)
 
 ### Ejemplo 2
-
+![Diagrama temporal ejemplo 2](Ejemplo2.png)
+{: height="36px" width="36px"}
 
 ### Ejemplo 3
 
