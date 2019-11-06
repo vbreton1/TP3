@@ -1,12 +1,18 @@
-# TP3 - LPC43xx Entradas y Salidas (Digitales) de Propósito General (GPIO) – FreeRTOS
+# # Documentación Trabajo Práctico N° 3
 
-Practica n°3 de sistemas embebidos.
+**Seminario de Electrónica: Sistemas Embebidos**
 
-## 1. Uso del IDE (Integrated Development Environment) LPCXpresso
+**LPC43xx Entradas y Salidas (Digitales) de Propósito General (GPIO) – Diagrama de Estado**
 
-### Documentacion de los proyectos importados
+Objetivo:  
+• Uso del IDE (edición, compilación y depuración de programas)  
+• Uso de GPIO & FreeRTOS (manejo de Salidas y de Entradas Digitales en Aplicaciones)  
+• Documentar lo que se solicita en c/ítems
 
-#### freertos_examples_1_to_9
+## 1. Estructura de archivos
+
+### freertos_examples_1_to_9
+
 Las carpetas de cada proyectos importados tienen la misma estructura.
 
 | Archivo | funcion |
@@ -21,27 +27,73 @@ Las carpetas de cada proyectos importados tienen la misma estructura.
 ```
 codes examples
 ```
-#### freertos_examples_10_to_16
 
-#### lcp_chip_43xx
+### freertos_examples_10_to_16
 
-#### lcp_board_nxp_lpcxpresso_4337
+### lcp_chip_43xx
 
-
-## 2. A partir del proyecto freertos_examples_1_to_9 => Example 1 - Creating tasks
+### lcp_board_nxp_lpcxpresso_4337
 
 
+## 2. Ejemplos del 1 al 9
 
-## 3. A partir del proyecto freertos_examples_10_to_16 => Example 10 - Blocking when receiving from a queue
-
-
-
-## 4. Implementacion de aplicación 1
+### Ejemplo 1
 
 
 
-## 5. Implementacion de aplicación 2
+### Ejemplo 2
+
+
+### Ejemplo 3
+
+
+### Ejemplo 4
+
+
+### Ejemplo 5
+
+
+### Ejemplo 6
+
+
+### Ejemplo 7
+
+
+### Ejemplo 8
+
+
+### Ejemplo 9
+
+
+## 3. Ejemplos del 10 al 16
+
+### Ejemplo 10
+
+
+### Ejemplo 11
+
+
+### Ejemplo 12
+
+
+### Ejemplo 13
+
+
+### Ejemplo 14
+
+
+### Ejemplo 15
+
+
+### Ejemplo 16
+
+
+## 4. Implementación de aplicación 1
 
 
 
-## 6. Implementacion de aplicación 3
+## 5. Implementación de aplicación 2
+
+
+
+## 6. Implementación de aplicación 3
