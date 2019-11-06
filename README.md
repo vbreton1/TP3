@@ -68,17 +68,17 @@ El ultimo archivo contiene los control de driver de la placa EDU-CIAA-NXP, como 
 | xTaskCreate(vTaskCode, "NAME", STACK_SIZE, &ucParameterToPass, tskIDLE_PRIORITY, &xHandle) | task.c/.h | Crea la tarea, memoriza el handle, asigna prioridades. | Es part of freeRTOS distribucion que provee un software robusto y estándar |
 | vTaskStartScheduler() | tasks.c/.h | Inicia el procesamiento en tiempo real, tiene control sobre qué tareas se ejecutan y cuándo. | Es igualmente part of the freeRTOS distribucion. |
 
-*prvSetupHardware():
-/*explicar*/
+*prvSetupHardware()*:
+	/explicar
 
-*DEBUGOUT(...):
-/*explicar*/
+*DEBUGOUT(...)*:
+	/explicar
 
-*xTaskCreate(...):
-/*explicar*/
+*xTaskCreate(...)*:
+	/explicar
 
-*vTaskStartScheduler():
-/*explicar*/
+*vTaskStartScheduler()*:
+	/explicar
 
 ## 2. Ejemplos del 1 al 9
 
