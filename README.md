@@ -47,11 +47,3 @@ codes examples
 
 
 ## 6. Implementación de aplicación 3
-
-
-
-## 5. Implementacion de aplicación 2
-
-
-
-## 6. Implementacion de aplicación 3
