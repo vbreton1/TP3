@@ -42,7 +42,7 @@ El archivo (.c) se puede desglosar así:
 	* EXAMPLE8
 	* EXAMPLE9
 	
-El archivo "readme.txt" permite de entender el funcionamiento y los parametricos de la aplicacion.
+El archivo "readme.txt" permite entender el funcionamiento y los parametricos de la aplicacion.
 * Descripcion del ejemplo.
 * Configuracion del hardware.
 * Como hacer un 'build' del proyecto.
