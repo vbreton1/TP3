@@ -49,11 +49,15 @@ El archivo "readme.txt" permite entender el funcionamiento y los parametricos de
 
 ### freertos_examples_10_to_16
 
+El contenido de este archivo es igual al del archivo anterior.
 
 ### lcp_chip_43xx
 
+Este archivo contiene los codigos (.c y .h) para el uso de los perifericos del sistema. (gpio, adc, i2c, timer, ...)
+
 ### lcp_board_nxp_lpcxpresso_4337
 
+El ultimo archivo contiene los control de driver de la placa EDU-CIAA-NXP, como el lcd o los entradas y salidas.
 
 ## 2. Ejemplos del 1 al 9
 
