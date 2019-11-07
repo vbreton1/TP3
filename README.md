@@ -115,8 +115,8 @@ La aplicación cree la tarea 1 con la prioridad más alta. Así se ejecuta en pr
 ## 3. Ejemplos del 10 al 16
 
 ### Ejemplo 10
-
-
+La aplicación empieza por la creación de una cola. Tenemos una primera tarea que envía un valor en la cola con “xQueueSendToBack(…)", y después cambia para la otra tarea de envío usando la función “taskYIELD()”.  Estas tareas tienen una prioridad baja. Además, tenemos una función de recepción con una prioridad más alta. En esta función esperamos con la función “uxQueueMessagesWaiting(…)" un valor en la cola. Cuando la tarea de envío envía el mensaje, la tarea de recepción pasa inmediatamente en estado “Ready”. Cuando el valor esta recibido regresamos a la misma tarea que cambia inmediatamente por la otra tarea de envío. Esta operación se repite de la misma manera. El grafico siguiente nos permiten entender mas facilmente el funcionamiento.
+![Diagrama temporal ejemplo 4](Ejemplo10.png)
 ### Ejemplo 11
 
 
