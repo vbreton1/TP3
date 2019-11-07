@@ -102,23 +102,24 @@ Para este ejemplo, en vez de usar la función vTaskDelay() se utiliza la funció
 
 ### Ejemplo 6
 Esta aplicación cree dos instancias de la tarea de tratamiento continuo, ambas en la prioridad 1, y una otra de la tarea periódica con una prioridad 2 más alta. Como las dos instancias están de tareas continuadas, solo se paran cuando la tarea de prioridad más alta pasa por el estado “Ready”. Así la tarea “Idle” nunca va a entrar en el estado “Ready” porque siempre hay tareas de estado más alto corriendo. Lo vemos en el siguiente gráfico.
-![Diagrama temporal ejemplo 4](Ejemplo6.png)
+![Diagrama temporal ejemplo 6](Ejemplo6.png)
 ### Ejemplo 7
 El ejemplo 7 cree una primera tarea con prioridad uno y una secunda con una prioridad 2. Las prioridades están definidas más alta que la prioridad de la tarea “Idle”.
 
 ### Ejemplo 8
 En este caso, las prioridades están dadas para la tarea 1 y la tarea 2 respectivamente alta y baja. dentro de cada tarea, la prioridad se cambia por una más baja para la tarea 1 y por una más alta para la tarea 2. Así la primera tarea está en el estado “Running” hasta que cambia su propia prioridad. Entonces pasa la tarea 2 en el estado “Running” también hasta que baja su propia prioridad. Las dos tareas van a correr una cada una como muestra el grafico siguiente.
-![Diagrama temporal ejemplo 4](Ejemplo8.png)
+![Diagrama temporal ejemplo 8](Ejemplo8.png)
 ### Ejemplo 9
 La aplicación cree la tarea 1 con la prioridad más alta. Así se ejecuta en primero. Dentro de la tarea 1 se crea la tarea dos que se ejecuta. Pero la única cosa que hace es borrarse a sí misma. Regresamos a la tarea 1 que ejecuta un “vTaskDelay()”. Empieza la tarea “Idle” hasta el fin del “delay”. Vimos en el siguiente gráfico la secuencia que se repite.
-![Diagrama temporal ejemplo 4](Ejemplo9.png)
+![Diagrama temporal ejemplo 9](Ejemplo9.png)
 ## 3. Ejemplos del 10 al 16
 
 ### Ejemplo 10
 La aplicación empieza por la creación de una cola. Tenemos una primera tarea que envía un valor en la cola con “xQueueSendToBack(…)", y después cambia para la otra tarea de envío usando la función “taskYIELD()”.  Estas tareas tienen una prioridad baja. Además, tenemos una función de recepción con una prioridad más alta. En esta función esperamos con la función “uxQueueMessagesWaiting(…)" un valor en la cola. Cuando la tarea de envío envía el mensaje, la tarea de recepción pasa inmediatamente en estado “Ready”. Cuando el valor esta recibido regresamos a la misma tarea que cambia inmediatamente por la otra tarea de envío. Esta operación se repite de la misma manera. El grafico siguiente nos permiten entender mas facilmente el funcionamiento.
-![Diagrama temporal ejemplo 4](Ejemplo10.png)
+![Diagrama temporal ejemplo 10](Ejemplo10.png)
 ### Ejemplo 11
-
+Acá cree las mismas tareas que el ejemplo 10 pero con una inversión de las prioridades entre el envío y la recepción. La cola tiene un tamaño de 3 estructuras de datos. El mensaje de recepción puede ser recibido solamente cuando la cola está llena. Al inicio las dos tareas de envío están enviando datos hasta que la cola sea llena. Así vemos en el grafico un cambio entre sender1, sender2, y de nuevo sender1. Después de 3 veces la cola está llena. Llegamos de nuevo en el sender2 que rápidamente se pone en esta bloqueado porque no hay espacio en la cola para enviar. La misma cosa pasa con el sender1. Después de eso pasa en estado “Running” el receiver. Después de una lectura en la cola, hay espacio, y como la prioridad de los sender es más alta, enviamos de nuevo para que la cola se llena. Después entramos en un estado que cambia entre envío y lectura, cambiando cada vez la tarea de envío.
+![Diagrama temporal ejemplo 11](Ejemplo11.png)
 
 ### Ejemplo 12
 
