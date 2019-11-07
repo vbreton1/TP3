@@ -83,21 +83,22 @@ El ultimo archivo contiene los control de driver de la placa EDU-CIAA-NXP, como 
 ## 2. Ejemplos del 1 al 9
 
 ### Ejemplo 1
-
+En este primer ejemplo, se crean las tareas _task1_ y _task2_ con la misma prioridad. Además cada tarea esta en condiciones para ejecutarse, por lo tanto _scheduler_ hace una transición entre las tareas para que corran por turnos. Cada una de las tareas se ejecutarán para un segmento de tiempo ("_time slice"_), en el cual pasará al estado de ejecución al comienzo de cada segmento y sale del estado de ejecución al finalizar el segmento de tiempo. En la siguiente imagen se muestra el diagrama temporal donde se muestran los tiempos de ejecución.
 ![Diagrama temporal ejemplo 1](Ejemplo1.png)
 
 ### Ejemplo 2
+En si, este segundo ejemplo es muy parecido al ejemplo anterior. Es más la salida es la misma.  La única diferencia es que en este ejemplo se crean dos instancias de la misma activadad. Es decir hay una sola actividad que se implementa tanto para la actividad 1 y la actividad 2. La función de la tarea es: static void vTaskFunction(void *pvParameters) y a traves del parámetros pvParameters se pasa el _string_ a imprimir. En sí el gráfico de tiempos de tareas es el mismo. El que se muestra a conituación tiene, además, la ejecución del kernel cuando hace el traspaso de una tarea a otra.
 ![Diagrama temporal ejemplo 2](Ejemplo2.png)
 
 
 ### Ejemplo 3
-
-
+En este caso la tarea 2 se crea con una mayor prioridad y como nunca pasa al estado de bloqueo, siempre se ejecutara esta tarea. Esto se muestra en la siguiente imagen, que como en el ejemplo anterior tambien se muestra la tarea del kernel para cada _time slice_.
+![Diagrama temporal ejemplo 3](Ejemplo3.png)
 ### Ejemplo 4
-
-
+Al igual que en el ejemplo 3, se crea una tarea con prioridad 1 y otra con prioridad 2, pero se usa la función vTaskDelay() que bloquea  la función una vez ejecutada hasta que el periodo del delay haya expirado. Por lo tanto primero se ejecuta la tarea 2  (ya que tiene mayor prioridad) y cuando se bloquea se ejecuta la tarea 1 que al imprimir su _string_ se bloquea y como no quedan más tareas el kernel crea la tarea IDLE. Vale la pena mensionar que el parámetro que se le pasa al a tarea vTaskDelay especifica el número de _ticks interruprs_ que deberían ocurrir entre una tarea que llama la funcion vTaskDelay() y la misma tarea que va a llamar una vez que haya transitado el estado de bloqueo, que en este caso serían 250ms. En la sigueinte imagen se muestra el patrón de ejecución de este ejemplo.
+![Diagrama temporal ejemplo 4](Ejemplo4.png)
 ### Ejemplo 5
-
+Para este ejemplo, en vez de usar la función vTaskDelay() se utiliza la función vTaskDelayUntil() que especifica la cantidad exacta de cuantos _ticks_ en el que se debe mover la tarea del estado bloqueado al estado listo para ejecutarse. Es la API a utilizar cuando se requiere un período de ejecución fijo. El gráfico es exactamente igual al del ejemplo 4.
 
 ### Ejemplo 6
 
