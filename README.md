@@ -101,14 +101,14 @@ Al igual que en el ejemplo 3, se crea una tarea con prioridad 1 y otra con prior
 Para este ejemplo, en vez de usar la función vTaskDelay() se utiliza la función vTaskDelayUntil() que especifica la cantidad exacta de cuantos _ticks_ en el que se debe mover la tarea del estado bloqueado al estado listo para ejecutarse. Es la API a utilizar cuando se requiere un período de ejecución fijo. El gráfico es exactamente igual al del ejemplo 4.
 
 ### Ejemplo 6
-
-
+Esta aplicación cree dos instancias de la tarea de tratamiento continuo, ambas en la prioridad 1, y una otra de la tarea periódica con una prioridad 2 más alta. Como las dos instancias están de tareas continuadas, solo se paran cuando la tarea de prioridad más alta pasa por el estado “Ready”. Así la tarea “Idle” nunca va a entrar en el estado “Ready” porque siempre hay tareas de estado más alto corriendo. Lo vemos en el siguiente gráfico.
+![Diagrama temporal ejemplo 4](Ejemplo6.png)
 ### Ejemplo 7
-
+El ejemplo 7 cree una primera tarea con prioridad uno y una secunda con una prioridad 2. Las prioridades están definidas más alta que la prioridad de la tarea “Idle”.
 
 ### Ejemplo 8
-
-
+En este caso, las prioridades están dadas para la tarea 1 y la tarea 2 respectivamente alta y baja. dentro de cada tarea, la prioridad se cambia por una más baja para la tarea 1 y por una más alta para la tarea 2. Así la primera tarea está en el estado “Running” hasta que cambia su propia prioridad. Entonces pasa la tarea 2 en el estado “Running” también hasta que baja su propia prioridad. Las dos tareas van a correr una cada una como muestra el grafico siguiente.
+![Diagrama temporal ejemplo 4](Ejemplo8.png)
 ### Ejemplo 9
 
 
