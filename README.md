@@ -110,8 +110,8 @@ El ejemplo 7 cree una primera tarea con prioridad uno y una secunda con una prio
 En este caso, las prioridades están dadas para la tarea 1 y la tarea 2 respectivamente alta y baja. dentro de cada tarea, la prioridad se cambia por una más baja para la tarea 1 y por una más alta para la tarea 2. Así la primera tarea está en el estado “Running” hasta que cambia su propia prioridad. Entonces pasa la tarea 2 en el estado “Running” también hasta que baja su propia prioridad. Las dos tareas van a correr una cada una como muestra el grafico siguiente.
 ![Diagrama temporal ejemplo 4](Ejemplo8.png)
 ### Ejemplo 9
-
-
+La aplicación cree la tarea 1 con la prioridad más alta. Así se ejecuta en primero. Dentro de la tarea 1 se crea la tarea dos que se ejecuta. Pero la única cosa que hace es borrarse a sí misma. Regresamos a la tarea 1 que ejecuta un “vTaskDelay()”. Empieza la tarea “Idle” hasta el fin del “delay”. Vimos en el siguiente gráfico la secuencia que se repite.
+![Diagrama temporal ejemplo 4](Ejemplo9.png)
 ## 3. Ejemplos del 10 al 16
 
 ### Ejemplo 10
