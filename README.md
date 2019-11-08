@@ -122,8 +122,8 @@ Acá cree las mismas tareas que el ejemplo 10 pero con una inversión de las pri
 ![Diagrama temporal ejemplo 11](Ejemplo11.png)
 
 ### Ejemplo 12
-
-
+La aplicación empieza creando explícitamente el semáforo binario. Cree después la tarea sincronizada con la interrupción con una prioridad alta para estar seguro que se va a ejecutar directamente después de la interrupción. Para hacer eso, usamos la funciones xSemaphoreGiveFromISR() y xSemaphoreTake() respectivamente en la función de interrupción y en la función sincronizada “Handler”. Se cree una tarea periódica la cual va a generar una interrupción. El funcionamiento es el siguiente (ver gráfico): esperamos que la tarea periódica se ejecuta. Esta tarea va a genera la interrupción, que da el semáforo, así se va a ejecutar directamente la tarea asociada que toma el semáforo. Después regresamos a la función periódica, y terminamos en el estado “Idle” esperando la tarea periódica.
+![Diagrama temporal ejemplo 12](Ejemplo12.png)
 ### Ejemplo 13
 
 
@@ -131,10 +131,10 @@ Acá cree las mismas tareas que el ejemplo 10 pero con una inversión de las pri
 
 
 ### Ejemplo 15
-
-
+Empezamos creando un “mutex” de tipo semáforo y un tipo de “delay”. La aplicación cree dos tareas con prioridades diferentes que van a escribir en la salida estandarte “stdout”, llamando la función “prvNewPrintString()". Esta función no permite la escritura en la salida si el “mutex” no se encuentra libre. Si una instancia está escribiendo en la salida, tiene el “mutex” y lo conserva hasta que se termina la escritura. Ademas, la aplicación declare en la tarea un “vTaskDelay()” con un tiempo aleatorio. Con esto sale un diagrama que puede ser modificado dependiendo del valor random. Después del timer se ejecuta la primera tarea que empieza a escribir. Al fin del “delay” esta anticipado por la otra tarea la cual tiene una prioridad mas alta, pero la tarea 1 no ha terminado de escribir (tiene el mutex), así que se ejecuta de nuevo la tarea 1 porque la función de escritura “prvNewPrintString()" bloquea si el “mutex” no está libre. La tarea termina su escritura, libera el “mutex”, y se puede ejecutar la tarea 2 que toma el “mutex”. De esta manera (usando los “mutex”) se evita los problemas de escritura que se cortaban en los primeros ejemplos que vimos. 
+![Diagrama temporal ejemplo 15](Ejemplo15.png)
 ### Ejemplo 16
-
+El ejemplo cree una cola que acepta al máximo 5 punteros sobre cadenas de caracteres. Cree, como anteriormente, dos tareas con el objetivo de escribir en la salida “stdout”. La diferencia es que se cree otra tarea que ejecuta un portón para escribir en la dicha salida. Las dos tareas, al lugar de usar un “mutex” para escribir en la salida, van a enviar el mensaje en una cola. La función de portón va a recuperar estas informaciones y enviar a la salida. Esta única función que puede acceder a la salida tiene una prioridad baja. Así que se ejecutan, como en el ejemplo 15, las tareas para enviar en la cola hasta que sea llena. Cuando está llena se da la mano a la tarea de portón porque las con alta prioridades no pueden ejecutarse. Cuando hay un espacio libre en la cola se ejecutan de nuevo las tareas de envío.
 
 ## 4. Implementación de aplicación 1
 
