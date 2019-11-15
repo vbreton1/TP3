@@ -29,6 +29,7 @@
 							<tool id="com.crt.advproject.cpp.lib.debug.451366593" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.lib.debug">
 								<option id="com.crt.advproject.cpp.hdrlib.1942123034" superClass="com.crt.advproject.cpp.hdrlib"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1038688000" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
+								<option id="com.crt.advproject.cpp.fpu.427915432" superClass="com.crt.advproject.cpp.fpu"/>
 							</tool>
 							<tool id="com.crt.advproject.gcc.lib.debug.1652494366" name="MCU C Compiler" superClass="com.crt.advproject.gcc.lib.debug">
 								<option id="com.crt.advproject.gcc.arch.1717474518" name="Architecture" superClass="com.crt.advproject.gcc.arch" value="com.crt.advproject.gcc.target.cm4" valueType="enumerated"/>

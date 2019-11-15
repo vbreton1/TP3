@@ -1,15 +1,17 @@
 /*
  * GENERATED FILE - DO NOT EDIT
- * (c) Code Red Technologies Ltd, 2008-2013
- * (c) NXP Semiconductors 2013-2017
+ * Copyright (c) 2008-2013 Code Red Technologies Ltd,
+ * Copyright 2015, 2018-2019 NXP
+ * (c) NXP Semiconductors 2013-2019
  * Generated linker script file for LPC4337
  * Created from library.ldt by FMCreateLinkLibraries
  * Using Freemarker v2.3.23
- * LPCXpresso v8.2.0 [Build 647] [2016-07-18]  on 17/05/2017 12:58:54
+ * MCUXpresso IDE v11.0.0 [Build 2516] [2019-06-05] on 14 nov. 2019 20:17:18
  */
 
 GROUP (
-  libcr_nohost.a
-  libcr_c.a
-  libcr_eabihelpers.a
+  "libcr_nohost.a"
+  "libcr_c.a"
+  "libcr_eabihelpers.a"
+  "libgcc.a"
 )

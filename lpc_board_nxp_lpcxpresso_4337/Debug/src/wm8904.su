@@ -1,0 +1,8 @@
+wm8904.c:147:12:Audio_Codec_SetDefaultValues	24	static
+wm8904.c:169:10:WM8904_REG_Read	32	static
+wm8904.c:178:6:WM8904_REG_Write	24	static
+wm8904.c:186:5:WM8904_REG_WriteVerify	24	static
+wm8904.c:195:5:WM8904_REG_VerifyMult	40	static
+wm8904.c:213:5:WM8904_Init	24	static
+wm8904.c:253:13:delay	16	static
+wm8904.c:258:5:WM8904_MultiRegWrite	24	static

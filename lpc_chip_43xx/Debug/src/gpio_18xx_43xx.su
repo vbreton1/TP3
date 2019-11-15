@@ -1,0 +1,10 @@
+gpio_18xx_43xx.h:146:20:Chip_GPIO_SetPinDIROutput	16	static
+gpio_18xx_43xx.h:158:20:Chip_GPIO_SetPinDIRInput	16	static
+gpio_18xx_43xx.h:219:20:Chip_GPIO_SetPortDIROutput	24	static
+gpio_18xx_43xx.h:233:20:Chip_GPIO_SetPortDIRInput	24	static
+gpio_18xx_43xx.c:51:6:Chip_GPIO_Init	16	static
+gpio_18xx_43xx.c:56:6:Chip_GPIO_DeInit	16	static
+gpio_18xx_43xx.c:61:6:Chip_GPIO_WriteDirBit	24	static
+gpio_18xx_43xx.c:72:6:Chip_GPIO_SetDir	24	static
+gpio_18xx_43xx.c:83:6:Chip_GPIO_SetPinDIR	16	static
+gpio_18xx_43xx.c:94:6:Chip_GPIO_SetPortDIR	16	static

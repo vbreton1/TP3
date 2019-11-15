@@ -31,7 +31,7 @@ all: freertos_statechart.axf
 freertos_statechart.axf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU Linker'
-	arm-none-eabi-gcc -nostdlib -L"C:\Users\JMCruz\Documents\LPCXpresso_8.2.0_647\workspace-EDU_CIAA_NXP\lpc_chip_43xx\Debug" -L"C:\Users\JMCruz\Documents\LPCXpresso_8.2.0_647\workspace-EDU_CIAA_NXP\lpc_board_nxp_lpcxpresso_4337\Debug" -Xlinker -Map="freertos_statechart.map" -Xlinker --gc-sections -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb -T "freertos_statechart_Debug.ld" -o "freertos_statechart.axf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -nostdlib -L"C:\Users\valen\Documents\FIUBA\Sistemas_Embebidos\TP3\LPCXpresso-FreeRTOS-Examples\lpc_chip_43xx\Debug" -L"C:\Users\valen\Documents\FIUBA\Sistemas_Embebidos\TP3\LPCXpresso-FreeRTOS-Examples\lpc_board_nxp_lpcxpresso_4337\Debug" -Xlinker -Map="freertos_statechart.map" -Xlinker --gc-sections -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb -T "freertos_statechart_Debug.ld" -o "freertos_statechart.axf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
@@ -46,7 +46,6 @@ post-build:
 	-arm-none-eabi-size "freertos_statechart.axf"; # arm-none-eabi-objcopy -v -O binary "freertos_statechart.axf" "freertos_statechart.bin" ; # checksum -p LPC4337 -d "freertos_statechart.bin";
 	-@echo ' '
 
-.PHONY: all clean dependents
-.SECONDARY: post-build
+.PHONY: all clean dependents post-build
 
 -include ../makefile.targets

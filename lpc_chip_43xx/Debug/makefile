@@ -44,7 +44,6 @@ post-build:
 	-arm-none-eabi-size "liblpc_chip_43xx.a" ; # arm-none-eabi-objdump -h -S "liblpc_chip_43xx.a" >"liblpc_chip_43xx.lss"
 	-@echo ' '
 
-.PHONY: all clean dependents
-.SECONDARY: post-build
+.PHONY: all clean dependents post-build
 
 -include ../makefile.targets
