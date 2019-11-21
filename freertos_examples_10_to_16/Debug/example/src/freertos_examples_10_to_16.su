@@ -3,9 +3,9 @@ core_cm4.h:1508:22:NVIC_SetPendingIRQ	16	static
 core_cm4.h:1520:22:NVIC_ClearPendingIRQ	16	static
 core_cm4.h:1550:22:NVIC_SetPriority	16	static
 freertos_examples_10_to_16.c:62:13:prvSetupHardware	8	static
-freertos_examples_10_to_16.c:1259:13:prvSetupSoftwareInterrupt	8	static
-freertos_examples_10_to_16.c:1270:6:vSoftwareInterruptHandler	16	static
-freertos_examples_10_to_16.c:1295:13:vTask2	24	static
-freertos_examples_10_to_16.c:1347:13:vTask3	24	static
-freertos_examples_10_to_16.c:1381:13:vPeriodicTask1	24	static
-freertos_examples_10_to_16.c:1413:5:main	24	static
+freertos_examples_10_to_16.c:1263:13:prvSetupSoftwareInterrupt	8	static
+freertos_examples_10_to_16.c:1274:6:DAC_IRQHandler	16	static
+freertos_examples_10_to_16.c:1299:13:vTask2	24	static
+freertos_examples_10_to_16.c:1351:13:vTask3	24	static
+freertos_examples_10_to_16.c:1385:13:vPeriodicTask1	24	static
+freertos_examples_10_to_16.c:1417:5:main	24	static
