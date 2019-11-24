@@ -29,7 +29,7 @@ C_DEPS += \
 src/%.o: ../src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU C Compiler'
-	arm-none-eabi-gcc -D__REDLIB__ -DDEBUG -D__CODE_RED -D__USE_LPCOPEN -DCORE_M4 -I"C:\Users\valen\Documents\FIUBA\Sistemas_Embebidos\TP3\LPCXpresso-FreeRTOS-Examples\lpc_chip_43xx\inc" -I"C:\Users\valen\Documents\FIUBA\Sistemas_Embebidos\TP3\LPCXpresso-FreeRTOS-Examples\lpc_board_nxp_lpcxpresso_4337\inc" -O0 -g3 -Wall -c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -fsingle-precision-constant -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb -fstack-usage -specs=redlib.specs -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	arm-none-eabi-gcc -D__REDLIB__ -DDEBUG -D__CODE_RED -D__USE_LPCOPEN -DCORE_M4 -I"D:\FG\MMM2\Sistemas_embebidos\Workspaces_para_MCUXpressoide\workspace-EDU_CIAA_NXP-TP3_v2\lpc_chip_43xx\inc" -I"D:\FG\MMM2\Sistemas_embebidos\Workspaces_para_MCUXpressoide\workspace-EDU_CIAA_NXP-TP3_v2\lpc_board_nxp_lpcxpresso_4337\inc" -O0 -g3 -Wall -c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -fsingle-precision-constant -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb -fstack-usage -specs=redlib.specs -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

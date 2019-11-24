@@ -6,7 +6,7 @@
  * Generated linker script file for LPC4337
  * Created from memory.ldt by FMCreateLinkMemory
  * Using Freemarker v2.3.23
- * MCUXpresso IDE v11.0.0 [Build 2516] [2019-06-05] on 21 nov. 2019 20:15:12
+ * MCUXpresso IDE v11.0.1 [Build 2563] [2019-09-01] on 23/11/2019 21:05:46
  */
 
 MEMORY
