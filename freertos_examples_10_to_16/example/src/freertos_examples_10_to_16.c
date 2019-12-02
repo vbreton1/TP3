@@ -46,10 +46,12 @@
 #define EXAMPLE_14 (14)		/* Sending and receiving on a queue from within an interrupt */
 #define EXAMPLE_15 (15)		/* Re-writing vPrintString() to use a semaphore */
 #define EXAMPLE_16 (16)		/* Re-writing vPrintString() to use a gatekeeper task */
-#define Aplicacion1 (17)
-#define Aplicacion2 (18)
 
-#define TEST (Aplicacion2)
+#define EXERCISE_1 (17)		/* Ejercicio 1 */
+#define EXERCISE_2 (18)		/* Ejercicio 2 */
+#define EXERCISE_3 (19)		/* Ejercicio 3 */
+
+#define TEST (EXERCISE_1)
 
 /*****************************************************************************
  * Public types/enumerations/variables
@@ -1201,500 +1203,486 @@ int main(void)
     return ((int) NULL);
 }
 #endif
+
+
+
+#if (TEST == EXERCISE_1)		/* Ejercicio 1 */
+
+const char *pcTextForMain = "\r\nEjercicio 1\r\n";
+
+#define mainSW_INTERRUPT_ID             (0)
+
+/* Macro to force an interrupt. */
+#define mainTRIGGER_INTERRUPT() NVIC_SetPendingIRQ(mainSW_INTERRUPT_ID)
+
+/* Macro to clear the same interrupt. */
+#define mainCLEAR_INTERRUPT()   NVIC_ClearPendingIRQ(mainSW_INTERRUPT_ID)
+
+#define mainSOFTWARE_INTERRUPT_PRIORITY (5)
+
+/* The tasks to be created. */
+static void vTask1(void* pvParameters);
+static void vTask2(void* pvParameters);
+static void vTask3(void* pvParameters);
+
+/* Enable the software interrupt and set its priority. */
+static void prvSetupSoftwareInterrupt();
+
+#define vSoftwareInterruptHandler (DAC_IRQHandler)
+
+
+xSemaphoreHandle xBinarySemaphore;
+
+xQueueHandle xQueue;
+
+
+volatile long interrupt = 0;
+
+
+static void vTask1(void* pvParameters)
+{
+        while(1)
+        {
+                /*      This task is just used to 'simulate' an interrupt.  This is done by
+                        periodically generating a software interrupt. */
+                vTaskDelay(500 / portTICK_RATE_MS);
+
+                /*      Generate the interrupt, printing a message both before hand and
+                        afterwards so the sequence of execution is evident from the output. */
+                DEBUGOUT("Task1: Periodic task - About to generate an interrupt.\r\n");
+
+                mainTRIGGER_INTERRUPT();
+
+        }
+}
+
+
+/* Take Semaphore, UART (or output) & LED toggle thread */
+static void vTask2(void* pvParameters)
+{
+        long lValueToSend;
+
+        xSemaphoreTake(xBinarySemaphore, (portTickType) 0);
+
+        while(1)
+        {
+                Board_LED_Toggle(LED3);
+
+                xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
+
+                /*      To get here the event must have occurred.  Process the event (in this
+                        case we just print out a message). */
+                lValueToSend = interrupt;
+
+                DEBUGOUT("Task2: Semaphore taken, sending %d to queue.\r\n",lValueToSend);
+
+                if(pdPASS != xQueueSendToBack(xQueue, &lValueToSend, (portTickType)0))
+                {
+                        DEBUGOUT("Could not send to the queue.\r\n");
+                }
+        }
+}
+
+
+static void vTask3(void* pvParameters)
+{
+        /* Declare the variable that will hold the values received from the queue. */
+
+        long lReceivedValue;
+
+        portBASE_TYPE xStatus;
+
+        while(1)
+        {
+                Board_LED_Set(LED3, LED_OFF);
+
+                if(uxQueueMessagesWaiting(xQueue) != 0)
+                {
+                        DEBUGOUT("Queue not empty.\r\n");
+                }
+
+                xStatus = xQueueReceive(xQueue, &lReceivedValue, portMAX_DELAY);
+
+                if(xStatus == pdPASS)
+                {
+                        /*      Data was successfully received from the queue, print out the received
+                                value. */
+                        DEBUGOUT("Task3: Received = %d\r\n", lReceivedValue);
+                }
+                else
+                {
+                        DEBUGOUT("Task3: Error receiving from the queue.\r\n");
+                }
+        }
+}
+
+
+static void prvSetupSoftwareInterrupt()
+{
+        /*      The interrupt service routine uses an (interrupt safe) FreeRTOS API
+                function so the interrupt priority must be at or below the priority defined
+                by configSYSCALL_INTERRUPT_PRIORITY. */
+        NVIC_SetPriority(mainSW_INTERRUPT_ID, mainSOFTWARE_INTERRUPT_PRIORITY);
+
+        /* Enable the interrupt. */
+        NVIC_EnableIRQ(mainSW_INTERRUPT_ID);
+}
+
+
+void vSoftwareInterruptHandler(void)
+{
+        portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+        /* 'Give' the semaphore to unblock the task. */
+        xSemaphoreGiveFromISR(xBinarySemaphore, &xHigherPriorityTaskWoken);
+
+        interrupt++;
+
+        /*      Clear the software interrupt bit using the interrupt controllers
+                Clear Pending register. */
+        mainCLEAR_INTERRUPT();
+
+        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+}
+
+
+int main(void)
+{
+		/* Sets up system hardware */
+		prvSetupHardware();
+
+		/* Print out the name of this example. */
+		DEBUGOUT(pcTextForMain);
+
+        vSemaphoreCreateBinary(xBinarySemaphore);
+
+        xQueue = xQueueCreate(5, sizeof(long));
+
+        /* Check the semaphore was created successfully. */
+        if(xBinarySemaphore != (xSemaphoreHandle) NULL && xQueue != (xQueueHandle)NULL)
+        {
+                /* Enable the software interrupt and set its priority. */
+                prvSetupSoftwareInterrupt();
+
+                /* Task 1 */
+                xTaskCreate(vTask1, (char*) "Task1", configMINIMAL_STACK_SIZE, NULL,
+                            (tskIDLE_PRIORITY + 1UL), (xTaskHandle*) NULL);
+
+                /* Task 2 */
+                xTaskCreate(vTask2, (char*) "Task2", configMINIMAL_STACK_SIZE, NULL,
+                            (tskIDLE_PRIORITY), (xTaskHandle*) NULL);
+
+                /* Task 3 */
+                xTaskCreate(vTask3, (char*) "Task3", configMINIMAL_STACK_SIZE, NULL,
+                            (tskIDLE_PRIORITY), (xTaskHandle*) NULL);
+
+
+                /* Start the scheduler so the created tasks start executing. */
+                vTaskStartScheduler();
+        }
+
+        /*      If all is well we will never reach here as the scheduler will now be
+                running the tasks.  If we do reach here then it is likely that there was
+                insufficient heap memory available for a resource to be created. */
+        while(1);
+
+        /* Should never arrive here */
+        return ((int) NULL);
+}
+#endif
+
+#if (TEST == EXERCISE_2)		/* Ejercicio 2 */
+
+const char *pcTextForMain = "\r\nEjercicio 2\r\n";
+
+#define mainSW_INTERRUPT_ID             (0)
+
+/* Macro to force an interrupt. */
+#define mainTRIGGER_INTERRUPT() NVIC_SetPendingIRQ(mainSW_INTERRUPT_ID)
+
+/* Macro to clear the same interrupt. */
+#define mainCLEAR_INTERRUPT()   NVIC_ClearPendingIRQ(mainSW_INTERRUPT_ID)
+
+#define mainSOFTWARE_INTERRUPT_PRIORITY (5)
+
+/* The tasks to be created. */
+static void vTask1(void* pvParameters);
+static void vTask2(void* pvParameters);
+static void vTask3(void* pvParameters);
+
+/* Enable the software interrupt and set its priority. */
+static void prvSetupSoftwareInterrupt();
+
+#define vSoftwareInterruptHandler (DAC_IRQHandler)
+
+
+xSemaphoreHandle xBinarySemaphore;
+
+xQueueHandle xQueue;
+
+
+volatile long interrupt = 0;
+
+
+static void vTask1(void* pvParameters)
+{
+        while(1)
+        {
+                /*      This task is just used to 'simulate' an interrupt.  This is done by
+                        periodically generating a software interrupt. */
+                vTaskDelay(500 / portTICK_RATE_MS);
+
+                interrupt ++;
+
+                /*      Generate the interrupt, printing a message both before hand and
+                        afterwards so the sequence of execution is evident from the output. */
+                DEBUGOUT("Task1: Periodic task - About to generate an interrupt.\r\n");
+
+                mainTRIGGER_INTERRUPT();
+
+        }
+}
+
+
+static void vTask2(void* pvParameters)
+{
+        /* Declare the variable that will hold the values received from the queue. */
+        long lReceivedValue;
+
+        portBASE_TYPE xStatus;
+
+        while(1)
+        {
+                Board_LED_Set(LED3, LED_OFF);
+                if(uxQueueMessagesWaiting(xQueue) != 0)
+                {
+                        DEBUGOUT("Queue not empty.\r\n");
+                }
+                xStatus = xQueueReceive(xQueue, &lReceivedValue, portMAX_DELAY);
+                if(xStatus == pdPASS)
+                {
+                        /*      Data was successfully received from the queue, print out the received
+                                value. */
+                        DEBUGOUT("Task2: Received = %d\r\n", lReceivedValue);
+                }
+                else
+                {
+                        DEBUGOUT("Task2: Error receiving from the queue.\r\n");
+                }
+                xSemaphoreGive(xBinarySemaphore);
+        }
+}
+
+static void vTask3(void* pvParameters)
+{
+        xSemaphoreTake(xBinarySemaphore, (portTickType) 0);
+
+        while(1)
+        {
+                Board_LED_Toggle(LED3);
+
+                xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
+
+                DEBUGOUT("Task3: Semaphore taken.\r\n");
+        }
+}
+
+
+static void prvSetupSoftwareInterrupt()
+{
+        /*      The interrupt service routine uses an (interrupt safe) FreeRTOS API
+                function so the interrupt priority must be at or below the priority defined
+                by configSYSCALL_INTERRUPT_PRIORITY. */
+        NVIC_SetPriority(mainSW_INTERRUPT_ID, mainSOFTWARE_INTERRUPT_PRIORITY);
+
+        /* Enable the interrupt. */
+        NVIC_EnableIRQ(mainSW_INTERRUPT_ID);
+}
+
+
+void vSoftwareInterruptHandler(void)
+{
+        portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+        long var = interrupt;
+
+        xQueueSendToBackFromISR(xQueue, &var, &xHigherPriorityTaskWoken);
+
+        mainCLEAR_INTERRUPT();
+
+        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+}
+
+
+int main(void)
+{
+		/* Sets up system hardware */
+		prvSetupHardware();
+
+		/* Print out the name of this example. */
+		DEBUGOUT(pcTextForMain);
+
+        vSemaphoreCreateBinary(xBinarySemaphore);
+
+        xQueue = xQueueCreate(5, sizeof(long));
+
+        /* Check the semaphore was created successfully. */
+        if(xBinarySemaphore != (xSemaphoreHandle) NULL && xQueue != (xQueueHandle)NULL)
+        {
+                /* Enable the software interrupt and set its priority. */
+                prvSetupSoftwareInterrupt();
+
+                /* Task 1 */
+                xTaskCreate(vTask1, (char*) "Task1", configMINIMAL_STACK_SIZE, NULL,
+                            (tskIDLE_PRIORITY + 1UL), (xTaskHandle*) NULL);
+
+                /*Task 2 */
+                xTaskCreate(vTask2, (char*) "Task2", configMINIMAL_STACK_SIZE, NULL,
+                            (tskIDLE_PRIORITY), (xTaskHandle*) NULL);
+
+                /* Task 3 */
+                xTaskCreate(vTask3, (char*) "Task3", configMINIMAL_STACK_SIZE, NULL,
+                            (tskIDLE_PRIORITY), (xTaskHandle*) NULL);
+
+                /* Start the scheduler so the created tasks start executing. */
+                vTaskStartScheduler();
+        }
+
+        /*      If all is well we will never reach here as the scheduler will now be
+                running the tasks.  If we do reach here then it is likely that there was
+                insufficient heap memory available for a resource to be created. */
+        while(1);
+
+        /* Should never arrive here */
+        return ((int) NULL);
+}
+
+#endif
+
+#if (TEST == EXERCISE_3)		/* Ejercicio 3 */
+
+const char *pcTextForMain = "\r\nEjercicio 3\r\n";
+
+/* Dimensions the buffer into which messages destined for stdout are placed. */
+#define mainMAX_MSG_LEN	( 80 )
+
+/* The task to be created.  Two instances of this task are created. */
+static void prvPrintTask(void *pvParameters);
+
+/* The function that uses a mutex to control access to standard out. */
+static void prvNewPrintString(const portCHAR *pcString);
+
+/* Declare a variable of type xSemaphoreHandle.  This is used to reference the
+ * mutex type semaphore that is used to ensure mutual exclusive access to stdout. */
+xSemaphoreHandle xMutex;
+
+
+/* Take Mutex Semaphore, UART (or output) & LED toggle thread */
+static void prvNewPrintString(const portCHAR *pcString)
+{
+	static char cBuffer[mainMAX_MSG_LEN];
+
+	/* The semaphore is created before the scheduler is started so already
+	 * exists by the time this task executes.
+	 *
+	 * Attempt to take the semaphore, blocking indefinitely if the mutex is not
+	 * available immediately.  The call to xSemaphoreTake() will only return when
+	 * the semaphore has been successfully obtained so there is no need to check the
+	 * return value.  If any other delay period was used then the code must check
+	 * that xSemaphoreTake() returns pdTRUE before accessing the resource (in this
+	 * case standard out. */
+	xSemaphoreTake(xMutex, portMAX_DELAY);
+	{
+		/* The following line will only execute once the semaphore has been
+		 * successfully obtained - so standard out can be accessed freely. */
+		sprintf(cBuffer, "%s", pcString);
+		DEBUGOUT(cBuffer);
+		Board_LED_Toggle(LED3);
+		vTaskDelay(500 / portTICK_RATE_MS);
+		Board_LED_Toggle(LED3);
+		vTaskDelay(500 / portTICK_RATE_MS);
+	}
+	xSemaphoreGive(xMutex);
+	taskYIELD();
+}
+
+
+static void prvPrintTask( void *pvParameters )
+{
+char *pcStringToPrint;
+
+	/* Two instances of this task are created so the string the task will send
+	 * to prvNewPrintString() is passed in the task parameter.  Cast this to the
+	 * required type. */
+	pcStringToPrint = (char *) pvParameters;
+
+	while (1) {
+		/* Print out the string using the newly defined function. */
+		prvNewPrintString( pcStringToPrint );
+
+		/* Wait a pseudo random time.  Note that rand() is not necessarily
+		 * re-entrant, but in this case it does not really matter as the code does
+		 * not care what value is returned.  In a more secure application a version
+		 * of rand() that is known to be re-entrant should be used - or calls to
+		 * rand() should be protected using a critical section. */
+		//vTaskDelay((rand() & 0x1FF));
+	}
+}
+
+
+/*****************************************************************************
+ * Public functions
+ ****************************************************************************/
+/**
+ * @brief	main routine for FreeRTOS example 15 - Re-writing vPrintString() to use a semaphore
+ * @return	Nothing, function should not exit
+ */
+int main(void)
+{
+	/* Sets up system hardware */
+	prvSetupHardware();
+
+	/* Print out the name of this example. */
+	DEBUGOUT(pcTextForMain);
+
+    /* Before a semaphore is used it must be explicitly created.  In this example
+     * a mutex type semaphore is created. */
+    xMutex = xSemaphoreCreateMutex();
+
+	/* The tasks are going to use a pseudo random delay, seed the random number
+	 * generator. */
+	//srand(567);
+
+	/* Only create the tasks if the semaphore was created successfully. */
+	if (xMutex != NULL) {
+		/* Create two instances of the tasks that attempt to write stdout.  The
+		 * string they attempt to write is passed in as the task parameter.  The tasks
+		 * are created at different priorities so some pre-emption will occur. */
+		xTaskCreate(prvPrintTask, (char *) "Print1", configMINIMAL_STACK_SIZE,
+					"Task 1 ******************************************\r\n",
+					(tskIDLE_PRIORITY + 1UL), (xTaskHandle *) NULL);
+		xTaskCreate(prvPrintTask, (char *) "Print2", configMINIMAL_STACK_SIZE,
+					"Task 2 ------------------------------------------\r\n",
+					(tskIDLE_PRIORITY + 1UL), (xTaskHandle *) NULL);
+		xTaskCreate(prvPrintTask, (char *) "Print3", configMINIMAL_STACK_SIZE,
+					"Task 3 ##########################################\r\n",
+					(tskIDLE_PRIORITY + 1UL), (xTaskHandle *) NULL);
+
+		/* Start the scheduler so the created tasks start executing. */
+		vTaskStartScheduler();
+	}
+	/* If all is well we will never reach here as the scheduler will now be
+     * running the tasks.  If we do reach here then it is likely that there was
+     * insufficient heap memory available for a resource to be created. */
+	while (1);
+
+	/* Should never arrive here */
+    return ((int) NULL);
+}
+#endif
+
+
+
 /**
  * @}
  */
-
-
-#if (TEST == Aplicacion1)		/* Blocking when receiving from a queue */
-
-const char *pcTextForMain = "\r\nAplicacion 1\r\n";
-
-
-#define mainSENDER_1		1
-#define mainSENDER_2		2
-
-/* The tasks to be created.  Two instances are created of the sender task while
- * only a single instance is created of the receiver task. */
-static void vTask2(void *pvParameters);
-static void vTask3(void *pvParameters);
-static void vPeriodicTask1(void *pvParameters);
-static void vHandlerTask(void *pvParameters);
-/* Enable the software interrupt and set its priority. */
-static void prvSetupSoftwareInterrupt();
-
-/* Declare a variable of type xQueueHandle.  This is used to store the queue. */
-xQueueHandle xQueue;
-
-/* Declare a variable of type xSemaphoreHandle.  This is used to reference the
- * semaphore that is used to synchronize a task with an interrupt. */
-xSemaphoreHandle xBinarySemaphore;
-
-/* The interrupt number to use for the software interrupt generation.  This
- * could be any unused number.  In this case the first chip level (non system)
- * interrupt is used, which happens to be the watchdog on the LPC1768.  WDT_IRQHandler */
-/* interrupt is used, which happens to be the DAC on the LPC4337 M4.  DAC_IRQHandler */
-#define mainSW_INTERRUPT_ID		(0)
-
-/* Macro to force an interrupt. */
-#define mainTRIGGER_INTERRUPT()	NVIC_SetPendingIRQ(mainSW_INTERRUPT_ID)
-
-/* Macro to clear the same interrupt. */
-#define mainCLEAR_INTERRUPT()	NVIC_ClearPendingIRQ(mainSW_INTERRUPT_ID)
-
-/* The priority of the software interrupt.  The interrupt service routine uses
- * an (interrupt safe) FreeRTOS API function, so the priority of the interrupt must
- * be equal to or lower than the priority set by
- * configMAX_SYSCALL_INTERRUPT_PRIORITY - remembering that on the Cortex-M3 high
- * numeric values represent low priority values, which can be confusing as it is
- * counter intuitive. */
-#define mainSOFTWARE_INTERRUPT_PRIORITY	(5)
-
-/* Define the structure type that will be passed on the queue. */
-typedef struct {
-	unsigned char ucValue;
-	unsigned char ucSource;
-} xData;
-
-/* Declare two variables of type xData that will be passed on the queue. */
-static const xData xStructsToSend[2] = {
-	{100, mainSENDER_1}, /* Used by Sender1. */
-	{200, mainSENDER_2}  /* Used by Sender2. */
-};
-
-/* The service routine for the interrupt.  This is the interrupt that the
-* task will be synchronized with.  void vSoftwareInterruptHandler(void); */
-/* the watchdog on the LPC1768 => WDT_IRQHandler */ /* the DAC on the LPC4337 M4.  DAC_IRQHandler */
-#define vSoftwareInterruptHandler (DAC_IRQHandler)
-
-static void prvSetupSoftwareInterrupt()
-{
-	/* The interrupt service routine uses an (interrupt safe) FreeRTOS API
-	 * function so the interrupt priority must be at or below the priority defined
-	 * by configSYSCALL_INTERRUPT_PRIORITY. */
-	NVIC_SetPriority(mainSW_INTERRUPT_ID, mainSOFTWARE_INTERRUPT_PRIORITY);
-
-	/* Enable the interrupt. */
-	NVIC_EnableIRQ(mainSW_INTERRUPT_ID);
-}
-
-void vSoftwareInterruptHandler(void)
-{
-	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-
-    /* 'Give' the semaphore to unblock the task. */
-    xSemaphoreGiveFromISR(xBinarySemaphore, &xHigherPriorityTaskWoken);
-
-    /* Clear the software interrupt bit using the interrupt controllers
-     * Clear Pending register. */
-    mainCLEAR_INTERRUPT();
-
-    /* Giving the semaphore may have unblocked a task - if it did and the
-     * unblocked task has a priority equal to or above the currently executing
-     * task then xHigherPriorityTaskWoken will have been set to pdTRUE and
-     * portEND_SWITCHING_ISR() will force a context switch to the newly unblocked
-     * higher priority task.
-     *
-     * NOTE: The syntax for forcing a context switch within an ISR varies between
-     * FreeRTOS ports.  The portEND_SWITCHING_ISR() macro is provided as part of
-     * the Cortex-M3 port layer for this purpose.  taskYIELD() must never be called
-     * from an ISR! */
-    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-}
-
-/* Sender, UART (or output) & LED ON thread */
-static void vTask2(void *pvParameters)
-{
-	portBASE_TYPE xStatus;
-	const portTickType xTicksToWait = 100 / portTICK_RATE_MS;
-
-	/*   * Take the semaphore once to start with so the semaphore is empty before the infinite loop is entered.  The semaphore was created before the scheduler was started so before this task ran for the first time.*/
-	xSemaphoreTake(xBinarySemaphore, (portTickType) 0);
-
-	/* As per most tasks, this task is implemented in an infinite loop. */
-	while (1) {
-		Board_LED_Toggle(LED2);
-
-		/* Use the semaphore to wait for the event.  The task blocks
-		         * indefinitely meaning this function call will only return once the
-		         * semaphore has been successfully obtained - so there is no need to check
-		         * the returned value. */
-		xSemaphoreTake(xBinarySemaphore,  portMAX_DELAY);
-
-		/* The first parameter is the queue to which data is being sent.  The
-		 * queue was created before the scheduler was started, so before this task
-		 * started to execute.
-		 *
-		 * The second parameter is the address of the structure being sent.  The
-		 * address is passed in as the task parameter.
-		 *
-		 * The third parameter is the Block time - the time the task should be kept
-		 * in the Blocked state to wait for space to become available on the queue
-		 * should the queue already be full.  A block time is specified as the queue
-		 * will become full.  Items will only be removed from the queue when both
-		 * sending tasks are in the Blocked state.. */
-		xStatus = xQueueSendToBack(xQueue, pvParameters, xTicksToWait);
-
-		if (xStatus != pdPASS) {
-			/* We could not write to the queue because it was full - this must
-			 * be an error as the receiving task should make space in the queue
-			 * as soon as both sending tasks are in the Blocked state. */
-			DEBUGOUT("Could not send to the queue.\r\n");
-		}
-
-		/* Allow the other sender task to execute. */
-		taskYIELD();
-	}
-}
-
-/* Receiver, UART (or output) & LED OFF thread */
-static void vTask3(void *pvParameters)
-{
-	/* Declare the structure that will hold the values received from the queue. */
-	xData xReceivedStructure;
-	portBASE_TYPE xStatus;
-	const portTickType xTicksToWait = 1000 / portTICK_RATE_MS;
-
-	/* This task is also defined within an infinite loop. */
-	while (1) {
-		Board_LED_Toggle(LED3);
-
-		/* As this task only runs when the sending tasks are in the Blocked state,
-		 * and the sending tasks only block when the queue is full, this task should
-		 * always find the queue to be full.  3 is the queue length. */
-		if (uxQueueMessagesWaiting(xQueue) != 0) {
-			DEBUGOUT("Queue shouldn't be empty!\r\n");
-		}
-
-		/* The first parameter is the queue from which data is to be received.  The
-		 * queue is created before the scheduler is started, and therefore before this
-		 * task runs for the first time.
-		 *
-		 * The second parameter is the buffer into which the received data will be
-		 * placed.  In this case the buffer is simply the address of a variable that
-		 * has the required size to hold the received structure.
-		 *
-		 * The last parameter is the block time - the maximum amount of time that the
-		 * task should remain in the Blocked state to wait for data to be available
-		 * should the queue already be empty.  A block time is not necessary as this
-		 * task will only run when the queue is full so data will always be available. */
-		 //xStatus = xQueueReceive(xQueue, &xReceivedStructure,  (portTickType)0);
-		xStatus = xQueueReceive(xQueue, &xReceivedStructure,  xTicksToWait);
-
-		Board_LED_Toggle(LED1);
-	}
-}
-
-static void vPeriodicTask1(void *pvParameters)
-{
-
-	portTickType xLastExecutionTime;
-
-	/* Initialize the variable used by the call to vTaskDelayUntil(). */
-	xLastExecutionTime = xTaskGetTickCount();
-
-
-	/* As per most tasks, this task is implemented within an infinite loop. */
-	while (1) {
-		/* This task is just used to 'simulate' an interrupt.  This is done by
-		 * periodically generating a software interrupt. */
-		vTaskDelayUntil(&xLastExecutionTime, 500 / portTICK_RATE_MS);
-
-		Board_LED_Toggle(LED1);
-
-		/* Generate the interrupt, printing a message both before hand and
-		 * afterwards so the sequence of execution is evident from the output. */
-		DEBUGOUT("Periodic task - About to generate an interrupt.\r\n");
-		mainTRIGGER_INTERRUPT();
-		DEBUGOUT("Periodic task - Interrupt generated.\n\n");
-	}
-}
-
-
-/*****************************************************************************
- * Public functions
- ****************************************************************************/
-/**
- * @brief	main routine for FreeRTOS example 10 - Blocking when receiving from a queue
- * @return	Nothing, function should not exit
- */
-int main(void)
-{
-	/* Sets up system hardware */
-	prvSetupHardware();
-
-	/* Print out the name of this example. */
-	DEBUGOUT(pcTextForMain);
-
-    /* Before a semaphore is used it must be explicitly created.  In this example
-     * a binary semaphore is created. */
-    vSemaphoreCreateBinary(xBinarySemaphore);
-
-    /* The queue is created to hold a maximum of 5 long values. */
-    xQueue = xQueueCreate(1, sizeof(long));
-
-    /* Check the semaphore was created successfully. */
-    if (xBinarySemaphore != (xSemaphoreHandle) NULL) {
-    	/* Enable the software interrupt and set its priority. */
-    	prvSetupSoftwareInterrupt();
-
-    	xTaskCreate(vPeriodicTask1, (char *) "vPeriodicTask1", configMINIMAL_STACK_SIZE, NULL,
-    	(tskIDLE_PRIORITY + 1UL), (xTaskHandle *) NULL);
-
-    	if (xQueue != (xQueueHandle)NULL) {
-    		xTaskCreate(vTask2, (char *) "vTarea2", configMINIMAL_STACK_SIZE, (void *) &(xStructsToSend[0]),
-    					(tskIDLE_PRIORITY + 2UL), (xTaskHandle *) NULL);
-
-    		xTaskCreate(vTask3, (char *) "vTarea3", configMINIMAL_STACK_SIZE, NULL,
-    					(tskIDLE_PRIORITY + 3UL), (xTaskHandle *) NULL);
-    	}
-
-        /* Start the scheduler so the created tasks start executing. */
-        vTaskStartScheduler();
-    }
-
-    /* If all is well we will never reach here as the scheduler will now be
-     * running the tasks.  If we do reach here then it is likely that there was
-     * insufficient heap memory available for a resource to be created. */
-	while (1);
-
-	/* Should never arrive here */
-    return ((int) NULL);
-
-}
-#endif
-
-#if (TEST == Aplicacion2)		/* Blocking when receiving from a queue */
-
-const char *pcTextForMain = "\r\nAplicacion - Blocking when receiving from a queue\r\n";
-
-
-#define mainSENDER_1		1
-#define mainSENDER_2		2
-
-/* The tasks to be created.  Two instances are created of the sender task while
- * only a single instance is created of the receiver task. */
-static void vTask2(void *pvParameters);
-static void vTask3(void *pvParameters);
-static void vPeriodicTask1(void *pvParameters);
-/* Enable the software interrupt and set its priority. */
-static void prvSetupSoftwareInterrupt();
-
-
-/* Declare a variable of type xQueueHandle.  This is used to store the queue
- * that is accessed by all three tasks. */
-xQueueHandle xQueue;
-
-/* Declare a variable of type xSemaphoreHandle.  This is used to reference the
- * semaphore that is used to synchronize a task with an interrupt. */
-xSemaphoreHandle xBinarySemaphore;
-
-/* The interrupt number to use for the software interrupt generation.  This
- * could be any unused number.  In this case the first chip level (non system)
- * interrupt is used, which happens to be the watchdog on the LPC1768.  WDT_IRQHandler */
-/* interrupt is used, which happens to be the DAC on the LPC4337 M4.  DAC_IRQHandler */
-#define mainSW_INTERRUPT_ID		(0)
-
-/* Macro to force an interrupt. */
-#define mainTRIGGER_INTERRUPT()	NVIC_SetPendingIRQ(mainSW_INTERRUPT_ID)
-
-/* Macro to clear the same interrupt. */
-#define mainCLEAR_INTERRUPT()	NVIC_ClearPendingIRQ(mainSW_INTERRUPT_ID)
-
-/* The priority of the software interrupt.  The interrupt service routine uses
- * an (interrupt safe) FreeRTOS API function, so the priority of the interrupt must
- * be equal to or lower than the priority set by
- * configMAX_SYSCALL_INTERRUPT_PRIORITY - remembering that on the Cortex-M3 high
- * numeric values represent low priority values, which can be confusing as it is
- * counter intuitive. */
-#define mainSOFTWARE_INTERRUPT_PRIORITY	(5)
-
-/* Define the structure type that will be passed on the queue. */
-typedef struct {
-	unsigned char ucValue;
-	unsigned char ucSource;
-} xData;
-
-unsigned long ulNext = 0;
-unsigned long ulCount;
-unsigned long ul[100];
-
-/* Declare two variables of type xQueueHandle.  One queue will be read from
- * within an ISR, the other will be written to from within an ISR. */
-xQueueHandle xIntegerQueue, xStringQueue;
-
-/* The service routine for the interrupt.  This is the interrupt that the
-* task will be synchronized with.  void vSoftwareInterruptHandler(void); */
-/* the watchdog on the LPC1768 => WDT_IRQHandler */ /* the DAC on the LPC4337 M4.  DAC_IRQHandler */
-#define vSoftwareInterruptHandler (DAC_IRQHandler)
-
-static void prvSetupSoftwareInterrupt()
-{
-	/* The interrupt service routine uses an (interrupt safe) FreeRTOS API
-	 * function so the interrupt priority must be at or below the priority defined
-	 * by configSYSCALL_INTERRUPT_PRIORITY. */
-	NVIC_SetPriority(mainSW_INTERRUPT_ID, mainSOFTWARE_INTERRUPT_PRIORITY);
-
-	/* Enable the interrupt. */
-	NVIC_EnableIRQ(mainSW_INTERRUPT_ID);
-}
-
-void vSoftwareInterruptHandler(void)
-{
-	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-	static unsigned long ulReceivedNumber;
-
-	/* The strings are declared static const to ensure they are not allocated to the
-	 * interrupt service routine stack, and exist even when the interrupt service routine
-	 * is not executing. */
-	static const char *pcStrings[] = {
-	    "String 0\r\n",
-	    "String 1\r\n",
-	    "String 2\r\n",
-	    "String 3\r\n"
-	};
-
-        xQueueSendToBackFromISR(xStringQueue, &pcStrings[ulReceivedNumber], &xHigherPriorityTaskWoken);
-
-    /* Clear the software interrupt bit using the interrupt controllers
-     * Clear Pending register. */
-    mainCLEAR_INTERRUPT();
-
-    /* xHigherPriorityTaskWoken was initialised to pdFALSE.  It will have then
-     * been set to pdTRUE only if reading from or writing to a queue caused a task
-     * of equal or greater priority than the currently executing task to leave the
-     * Blocked state.  When this is the case a context switch should be performed.
-     * In all other cases a context switch is not necessary.
-     *
-     * NOTE: The syntax for forcing a context switch within an ISR varies between
-     * FreeRTOS ports.  The portEND_SWITCHING_ISR() macro is provided as part of
-     * the Cortex-M3 port layer for this purpose.  taskYIELD() must never be called
-     * from an ISR! */
-    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-}
-
-/* Sender, UART (or output) & LED ON thread */
-static void vTask2(void *pvParameters)
-{
-
-	char *pcString;
-
-	while (1) {
-		Board_LED_Toggle(LED2);
-
-		xQueueReceive(xStringQueue, &pcString, portMAX_DELAY);
-
-	    xSemaphoreGive(xBinarySemaphore);
-
-		//taskYIELD();
-	}
-}
-
-/* Receiver, UART (or output) & LED OFF thread */
-static void vTask3(void *pvParameters)
-{
-
-	xSemaphoreTake(xBinarySemaphore, (portTickType) 0);
-
-	/* This task is also defined within an infinite loop. */
-	while (1) {
-		Board_LED_Toggle(LED3);
-
-		 xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
-	}
-}
-
-static void vPeriodicTask1(void *pvParameters)
-{
-
-	portTickType xLastExecutionTime;
-
-	/* Initialize the variable used by the call to vTaskDelayUntil(). */
-	xLastExecutionTime = xTaskGetTickCount();
-
-
-	/* As per most tasks, this task is implemented within an infinite loop. */
-	while (1) {
-		/* This task is just used to 'simulate' an interrupt.  This is done by
-		 * periodically generating a software interrupt. */
-		vTaskDelayUntil(&xLastExecutionTime, 500 / portTICK_RATE_MS);
-
-		/* Generate the interrupt, printing a message both before hand and
-		 * afterwards so the sequence of execution is evident from the output. */
-		DEBUGOUT("Periodic task - About to generate an interrupt.\r\n");
-		Board_LED_Toggle(LED1);
-		mainTRIGGER_INTERRUPT();
-		DEBUGOUT("Periodic task - Interrupt generated.\n\n");
-	}
-}
-
-
-/*****************************************************************************
- * Public functions
- ****************************************************************************/
-/**
- * @brief	main routine for FreeRTOS example 10 - Blocking when receiving from a queue
- * @return	Nothing, function should not exit
- */
-int main(void)
-{
-	/* Sets up system hardware */
-	prvSetupHardware();
-
-	/* Print out the name of this example. */
-	DEBUGOUT(pcTextForMain);
-
-    /* Before a semaphore is used it must be explicitly created.  In this example
-     * a binary semaphore is created. */
-    vSemaphoreCreateBinary(xBinarySemaphore);
-
-    /* Before a queue can be used it must first be created.  Create both queues
-     * used by this example.  One queue can hold variables of type unsigned long,
-     * the other queue can hold variables of type char*.  Both queues can hold a
-     * maximum of 10 items.  A real application should check the return values to
-     * ensure the queues have been successfully created. */
-    xIntegerQueue = xQueueCreate(10, sizeof(unsigned long));
-	xStringQueue = xQueueCreate(10, sizeof(char *));
-
-    /* Check the semaphore was created successfully. */
-    if (xBinarySemaphore != (xSemaphoreHandle) NULL) {
-    	/* Enable the software interrupt and set its priority. */
-    	prvSetupSoftwareInterrupt();
-
-    	/* Create the task that will periodically generate a software interrupt.
-    	         * This is created with a priority below the handler task to ensure it will
-    	         * get preempted each time the handler task exits the Blocked state. */
-    	xTaskCreate(vPeriodicTask1, (char *) "vPeriodicTask1", configMINIMAL_STACK_SIZE, NULL,
-    	(tskIDLE_PRIORITY + 1UL), (xTaskHandle *) NULL);
-
-    	if (xStringQueue != (xQueueHandle)NULL) {
-    		/* Create two instances of the task that will write to the queue.  The
-    		 * parameter is used to pass the structure that the task should write to the
-    		 * queue, so one task will continuously send xStructsToSend[ 0 ] to the queue
-    		 * while the other task will continuously send xStructsToSend[ 1 ].  Both
-    		 * tasks are created at priority 2 which is above the priority of the receiver. */
-    		xTaskCreate(vTask2, (char *) "vTarea2", configMINIMAL_STACK_SIZE, NULL,
-    					(tskIDLE_PRIORITY + 2UL), (xTaskHandle *) NULL);
-
-    		/* Create the task that will read from the queue.  The task is created with
-    		 * priority 1, so below the priority of the sender tasks. */
-    		xTaskCreate(vTask3, (char *) "vTarea3", configMINIMAL_STACK_SIZE, NULL,
-    					(tskIDLE_PRIORITY + 3UL), (xTaskHandle *) NULL);
-    	}
-
-
-
-        /* Start the scheduler so the created tasks start executing. */
-        vTaskStartScheduler();
-    }
-
-    /* If all is well we will never reach here as the scheduler will now be
-     * running the tasks.  If we do reach here then it is likely that there was
-     * insufficient heap memory available for a resource to be created. */
-	while (1);
-
-	/* Should never arrive here */
-    return ((int) NULL);
-
-}
-#endif
