@@ -126,10 +126,18 @@ La aplicación empieza creando explícitamente el semáforo binario. Cree despu�
 ![Diagrama temporal ejemplo 12](Ejemplo12.png)
 ### Ejemplo 13
 
+Esta función utiliza un semaforo de conteo para sincroniar las tareas con las interrupciones. Se crea la tarea Handler sincronizada con la interrupción con la mayor prioridad.
+Luego se crea la tarea que generará períodicamente la itnerrupción con menor prioridad para que se ejecute cada vez que Handler vaya al estado bloqueado. La diferencia con el ejemplo 12
+es que se ejecuta 3 veces la función xSemaphoreGiveFromISR() cuando se produce la interrupción. De esta forma se alargaría el tiempo de ejecución de la tarea IDLE.
 
 ### Ejemplo 14
 
-
+En este ejemplo se generan dos colas una de enteros y una de char. En la función main se generan dos tareas, vIntegerGenerator con una prioridad de 1 y vStringPrinter con prioridad
+2. La idea es que se ejecute esta segunda actividad con mayor prioridad que llena una cola con 5 numeros y habilita la interrupción, que se ejecuta. Esta interrupción llama repetidamente 
+a la función xQueueReceiveFromISR() para vaciar la cola. Los valores recibidios los trunca a los 2 últoimos bits y los mando a la cola de string, para luego dar de baja la interrupción
+Para que se ejecute la función que imprime que tiene mayor prioridad. Al imprimir los datos, se bloquea por lo cual se ejecuuta la tarea de menro prioridad  que se bloquea hasta
+que pase los 200 ms hasta que vuelva a activar. En este tiempo se ejecuta la tarea IDLE. 
+![Diagrama temporal ejemplo 15](Ejemplo14.png)
 ### Ejemplo 15
 Empezamos creando un “mutex” de tipo semáforo y un tipo de “delay”. La aplicación cree dos tareas con prioridades diferentes que van a escribir en la salida estandarte “stdout”, llamando la función “prvNewPrintString()". Esta función no permite la escritura en la salida si el “mutex” no se encuentra libre. Si una instancia está escribiendo en la salida, tiene el “mutex” y lo conserva hasta que se termina la escritura. Ademas, la aplicación declare en la tarea un “vTaskDelay()” con un tiempo aleatorio. Con esto sale un diagrama que puede ser modificado dependiendo del valor random. Después del timer se ejecuta la primera tarea que empieza a escribir. Al fin del “delay” esta anticipado por la otra tarea la cual tiene una prioridad mas alta, pero la tarea 1 no ha terminado de escribir (tiene el mutex), así que se ejecuta de nuevo la tarea 1 porque la función de escritura “prvNewPrintString()" bloquea si el “mutex” no está libre. La tarea termina su escritura, libera el “mutex”, y se puede ejecutar la tarea 2 que toma el “mutex”. De esta manera (usando los “mutex”) se evita los problemas de escritura que se cortaban en los primeros ejemplos que vimos. 
 ![Diagrama temporal ejemplo 15](Ejemplo15.png)
